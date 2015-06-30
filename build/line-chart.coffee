@@ -1,5 +1,5 @@
 ###
-line-chart - v1.1.9 - 26 June 2015
+line-chart - v1.1.9 - 30 June 2015
 https://github.com/n3-charts/line-chart
 Copyright (c) 2015 n3-charts
 ###
@@ -247,23 +247,16 @@ mod.factory('n3utils', ['$window', '$log', '$rootScope', ($window, $log, $rootSc
 
       getMinDelta: (seriesData, key, scale, range) ->
         return d3.min(
-          # Compute the minimum difference along an axis on all series
           seriesData.map (series) ->
-            # Compute delta
             return series.values
-              # Look at all sclaed values on the axis
               .map((d) -> scale(d[key]))
-              # Select only columns in the visible range
               .filter((e) ->
-                return if range then e >= range[0] && e <= range[1] else true
+                #return if range then e >= range[0] && e <= range[1] else true
+                # FIXME Fix me in TS
+                return true
               )
-              # Return the smallest difference between 2 values
               .reduce((prev, cur, i, arr) ->
-                # Get the difference from the current value
-                # with the previous value in the array
                 diff = if i > 0 then cur - arr[i - 1] else Number.MAX_VALUE
-                # Return the new difference if it is smaller
-                # than the previous difference
                 return if diff < prev then diff else prev
               , Number.MAX_VALUE)
         )
@@ -279,14 +272,13 @@ mod.factory('n3utils', ['$window', '$log', '$rootScope', ($window, $log, $rootSc
         innerWidth = dimensions.width - dimensions.left - dimensions.right
 
         colData = seriesData
-          # Get column data (= columns that are not stacked)
           .filter((d) ->
             return pseudoColumns.hasOwnProperty(d.id)
           )
 
         # Get the smallest difference on the x axis in the visible range
         delta = this.getMinDelta(colData, 'x', axes.xScale, [0, innerWidth])
-        
+
         # We get a big value when we cannot compute the difference
         if delta > innerWidth
           # Set to some good looking ordinary value
@@ -357,6 +349,7 @@ mod.factory('n3utils', ['$window', '$log', '$rootScope', ($window, $log, $rootSc
               )
 
         return this
+
 # ----
 
 
@@ -1279,15 +1272,12 @@ mod.factory('n3utils', ['$window', '$log', '$rootScope', ($window, $log, $rootSc
 
         return axis unless o?
 
-        # ticks can be either an array of tick values
         if angular.isArray(o.ticks)
           axis.tickValues(o.ticks)
-        
-        # or a number of ticks (approximately)
+
         else if angular.isNumber(o.ticks)
           axis.ticks(o.ticks)
-        
-        # or a range function e.g. d3.time.minute
+
         else if angular.isFunction(o.ticks)
           axis.ticks(o.ticks, o.ticksInterval)
 
@@ -1298,7 +1288,7 @@ mod.factory('n3utils', ['$window', '$log', '$rootScope', ($window, $log, $rootSc
 
         axis = svg.selectAll('.x.axis')
           .call(scales.xAxis)
-        
+
         if options.axes.x.ticksRotate?
           axis.selectAll('.tick>text')
             .attr('dy', null)
@@ -1310,7 +1300,7 @@ mod.factory('n3utils', ['$window', '$log', '$rootScope', ($window, $log, $rootSc
           scales.yScale.domain(yDomain).nice()
           axis = svg.selectAll('.y.axis')
             .call(scales.yAxis)
-          
+
           if options.axes.y.ticksRotate?
             axis.selectAll('.tick>text')
               .attr('transform', 'rotate(' + options.axes.y.ticksRotate + ' -6,0)')
@@ -1321,7 +1311,7 @@ mod.factory('n3utils', ['$window', '$log', '$rootScope', ($window, $log, $rootSc
           scales.y2Scale.domain(y2Domain).nice()
           axis = svg.selectAll('.y2.axis')
             .call(scales.y2Axis)
-          
+
           if options.axes.y2.ticksRotate?
             axis.selectAll('.tick>text')
               .attr('transform', 'rotate(' + options.axes.y2.ticksRotate + ' 6,0)')

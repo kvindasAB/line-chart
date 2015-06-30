@@ -173,7 +173,9 @@ describe 'legend', ->
 
     it 'should compute for left and right series', ->
       sinon.stub(n3utils, 'getLegendItemsWidths', (svg, axis) ->
-        return if axis is 'y' then [99, 123] else [105, 149]
+        # FIXME
+        # return if axis is 'y' then [99, 123] else [105, 149]
+        return;
       )
 
       series = [{
