@@ -21,16 +21,23 @@
 
       getMinDelta: (seriesData, key, scale, range) ->
         return d3.min(
+          # Compute the minimum difference along an axis on all series
           seriesData.map (series) ->
+            # Compute delta
             return series.values
+              # Look at all sclaed values on the axis
               .map((d) -> scale(d[key]))
+              # Select only columns in the visible range
               .filter((e) ->
-                #return if range then e >= range[0] && e <= range[1] else true
-                # FIXME Fix me in TS
-                return true
+                return if range then e >= range[0] && e <= range[1] else true
               )
+              # Return the smallest difference between 2 values
               .reduce((prev, cur, i, arr) ->
+                # Get the difference from the current value
+                # with the previous value in the array
                 diff = if i > 0 then cur - arr[i - 1] else Number.MAX_VALUE
+                # Return the new difference if it is smaller
+                # than the previous difference
                 return if diff < prev then diff else prev
               , Number.MAX_VALUE)
         )
@@ -46,13 +53,14 @@
         innerWidth = dimensions.width - dimensions.left - dimensions.right
 
         colData = seriesData
+          # Get column data (= columns that are not stacked)
           .filter((d) ->
             return pseudoColumns.hasOwnProperty(d.id)
           )
 
         # Get the smallest difference on the x axis in the visible range
         delta = this.getMinDelta(colData, 'x', axes.xScale, [0, innerWidth])
-
+        
         # We get a big value when we cannot compute the difference
         if delta > innerWidth
           # Set to some good looking ordinary value
